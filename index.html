@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suite de Planeación Estratégica - 12 Modelos Empresariales</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            cyan: '#00B8D1',
+                            blue: '#005AAA',
+                            dark: '#284378',
+                            bg: '#F4F7FA',
+                            text: '#1E293B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js 4.4.0 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas 1.4.1 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F4F7FA;
+            color: #1E293B;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4F7FA;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #284378;
+            border-radius: 4px;
+        }
+        .active-nav {
+            background-color: #005AAA !important;
+            color: #FFFFFF !important;
+            border-left: 4px solid #00B8D1;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- HEADER DE LA APLICACIÓN -->
+    <header class="bg-[#284378] text-white h-16 flex items-center justify-between px-6 shadow-md z-20 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+            <button id="sidebarToggle" class="md:hidden text-white hover:text-[#00B8D1] focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="bg-[#00B8D1] p-2 rounded-lg text-[#284378] font-bold">
+                <i class="fa-solid fa-chart-line text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-xl font-bold tracking-wide leading-none">Suite Estratégica Corporativa</h1>
+                <p class="text-xs text-[#00B8D1] hidden sm:block">Plataforma de Análisis y Diagnóstico de Negocios</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-xs bg-[#005AAA] text-white px-3 py-1 rounded-full border border-[#00B8D1]/30 font-medium hidden md:inline-block">
+                12 Modelos Activos
+            </span>
+            <button onclick="exportCurrentModel()" class="bg-[#00B8D1] hover:bg-[#009dae] text-[#284378] font-semibold px-3 py-1.5 rounded-lg text-sm transition-all shadow flex items-center space-x-2">
+                <i class="fa-solid fa-download"></i>
+                <span class="hidden sm:inline">Exportar Captura</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- SIDEBAR DE NAVEGACIÓN -->
+        <aside id="sidebar" class="w-64 bg-[#284378] text-white flex-shrink-0 flex flex-col justify-between transition-all duration-300 absolute md:relative z-10 h-full -translate-x-full md:translate-x-0 shadow-lg">
+            <div class="overflow-y-auto py-4">
+                <div class="px-4 pb-2 text-xs font-semibold text-[#00B8D1] uppercase tracking-wider">
+                    Modelos de Análisis
+                </div>
+                <nav class="space-y-1 px-2" id="navigationMenu">
+                    <!-- Dinámico por JS -->
+                </nav>
+            </div>
+            <div class="p-3 bg-[#1e335c] text-center border-t border-gray-700/50">
+                <p class="text-xs text-gray-300 font-medium">L.E.M. Strategic Suite</p>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL / MODELOS -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-[#F4F7FA] relative" id="captureArea">
+            
+            <!-- TARJETA SUPERIOR DE CONTROL E INFORMACIÓN -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span id="modelNumber" class="bg-[#005AAA] text-white text-xs font-bold px-2.5 py-1 rounded-md">M01</span>
+                            <h2 id="modelTitle" class="text-2xl font-bold text-[#284378]">Análisis FODA (SWOT)</h2>
+                        </div>
+                        <p id="modelSubtitle" class="text-sm text-gray-500 mt-1">Evaluación de Fortalezas, Oportunidades, Debilidades y Amenazas para el diagnóstico interno y externo.</p>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN GLOBAL POR MODELO -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="toggleDescription()" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-[#284378] text-xs font-semibold rounded-lg transition border border-gray-300 flex items-center space-x-1">
+                            <i class="fa-solid fa-circle-info text-[#005AAA]"></i>
+                            <span>Guía / Uso</span>
+                        </button>
+                        <button onclick="loadDemoData()" class="px-3 py-2 bg-[#005AAA] hover:bg-[#004888] text-white text-xs font-semibold rounded-lg transition shadow flex items-center space-x-1">
+                            <i class="fa-solid fa-magic-wand-sparkles text-[#00B8D1]"></i>
+                            <span>Cargar Demo</span>
+                        </button>
+                        <button onclick="calculateModel()" class="px-3 py-2 bg-[#00B8D1] hover:bg-[#009dae] text-[#284378] text-xs font-bold rounded-lg transition shadow flex items-center space-x-1">
+                            <i class="fa-solid fa-calculator"></i>
+                            <span>Calcular / Generar</span>
+                        </button>
+                        <button onclick="clearModelData()" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg transition border border-red-200 flex items-center space-x-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DESPLEGABLE GUÍA TEÓRICA -->
+                <div id="descriptionBox" class="hidden mt-4 pt-4 border-t border-gray-100 bg-blue-50/50 p-4 rounded-lg text-sm text-slate-700 border-l-4 border-l-[#005AAA]">
+                    <h4 class="font-bold text-[#284378] mb-1 flex items-center">
+                        <i class="fa-solid fa-book-open mr-2 text-[#005AAA]"></i> Fundamento Teórico y Metodológico
+                    </h4>
+                    <p id="modelDescriptionText" class="leading-relaxed"></p>
+                    <div class="mt-2 text-xs font-semibold text-[#005AAA]" id="modelUseCaseText"></div>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DINÁMICO DE FORMULARIO Y RESULTADOS -->
+            <div id="modelContainer" class="space-y-6">
+                <!-- Se inyecta la UI de cada herramienta de forma dinámica -->
+            </div>
+
+        </main>
+    </div>
+
+    <!-- PIE DE PÁGINA FIJO -->
+    <footer class="bg-[#284378] text-white text-xs py-2 px-6 border-t border-[#005AAA] flex justify-between items-center z-20 flex-shrink-0">
+        <div class="flex items-center space-x-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-[#00B8D1]"></span>
+            <span class="font-medium text-gray-300">Sistema de Diagnóstico Estratégico Activo</span>
+        </div>
+        <div class="font-semibold tracking-wide text-[#00B8D1]">
+            Desarrollada por Luis E Monreal
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE LA APLICACIÓN -->
+    <script>
+        // CONFIGURACIÓN DE LOS 12 MODELOS
+        const MODELS = [
+            { id: 'foda', name: '1. FODA (SWOT)', icon: 'fa-table-cells-large', title: 'Análisis FODA (SWOT)', number: 'M01', desc: 'Identifica las Fortalezas y Debilidades (ámbito interno), así como las Oportunidades y Amenazas (ámbito externo) de una organización.', use: 'Caso de uso: Diagnóstico inicial de situación de la empresa antes de iniciar la formulación de cualquier estrategia corporativa.' },
+            { id: 'dafo', name: '2. DAFO Cruzado', icon: 'fa-diagram-project', title: 'Matriz DAFO / Estrategias FO-FA-DO-DA', number: 'M02', desc: 'Cruza el análisis interno con el externo para derivar líneas de acción concretas: FO (Maxi-Maxi), FA (Maxi-Mini), DO (Mini-Maxi) y DA (Mini-Mini).', use: 'Caso de uso: Definición de iniciativas tácticas y estratégicas para aprovechar oportunidades y contrarrestar amenazas.' },
+            { id: 'came', name: '3. Matriz CAME', icon: 'fa-sliders', title: 'Matriz CAME (Acciones Estratégicas)', number: 'M03', desc: 'Herramienta operativa complementaria al DAFO: Corregir debilidades, Afrontar amenazas, Mantener fortalezas y Explotar oportunidades.', use: 'Caso de uso: Formulación del plan de acción operativo post-diagnóstico DAFO.' },
+            { id: 'pestel', name: '4. Análisis PESTEL', icon: 'fa-earth-americas', title: 'Análisis del Entorno PESTEL', number: 'M04', desc: 'Evalúa los factores macroambientales: Políticos, Económicos, Sociales, Tecnológicos, Ecológicos y Legales.', use: 'Caso de uso: Evaluación de riesgos y oportunidades en expansión a nuevos mercados o cambios de entorno regulatorio.' },
+            { id: 'bcg', name: '5. Matriz BCG', icon: 'fa-chart-pie', title: 'Matriz BCG (Crecimiento - Participación)', number: 'M05', desc: 'Categoriza la cartera de productos en Estrella, Interrogante, Vaca de Efectivo y Perro analizando la tasa de crecimiento del mercado y la participación relativa.', use: 'Caso de uso: Asignación de recursos financieros y decisiones sobre mantener, invertir o retirar productos.' },
+            { id: 'oceano', name: '6. Océano Azul', icon: 'fa-water', title: 'Matriz Océano Azul (Matriz de las 4 Acciones)', number: 'M06', desc: 'Identifica variables para Eliminar, Reducir, Incrementar y Crear (ERIC), rompiendo la disyuntiva valor-costo.', use: 'Caso de uso: Innovación estratégica y creación de nuevos espacios de mercado sin competencia directa.' },
+            { id: 'porter5', name: '7. 5 Fuerzas de Porter', icon: 'fa-[#00B8D1] fa-shield-halved', title: 'Análisis de las 5 Fuerzas de Porter', number: 'M07', desc: 'Mide la atractividad e intensidad competitiva de un sector analizando la rivalidad, nuevos competidores, sustitutos y poder de proveedores/clientes.', use: 'Caso de uso: Evaluación de rentabilidad potencial antes de ingresar a una industria o mercado.' },
+            { id: 'cadena', name: '8. Cadena de Valor', icon: 'fa-link', title: 'Cadena de Valor de Porter', number: 'M08', desc: 'Analiza las actividades primarias y de soporte para identificar fuentes de ventaja competitiva en costos o diferenciación.', use: 'Caso de uso: Optimización de procesos internos y análisis de la estructura de margen operativo.' },
+            { id: 'mckinsey', name: '9. 7S de McKinsey', icon: 'fa-cubes', title: 'Modelo de las 7S de McKinsey', number: 'M09', desc: 'Analiza la alineación organizacional mediante 7 factores clave: Strategy, Structure, Systems, Shared Values, Style, Staff y Skills.', use: 'Caso de uso: Gestión del cambio organizativo y procesos de reestructuración corporativa.' },
+            { id: 'ansoff', name: '10. Matriz de Ansoff', icon: 'fa-expand', title: 'Matriz de Ansoff (Producto / Mercado)', number: 'M10', desc: 'Evalúa las opciones de crecimiento estratégico: Penetración de Mercado, Desarrollo de Mercado, Desarrollo de Producto y Diversificación.', use: 'Caso de uso: Definición de la estrategia de crecimiento y estimación de niveles de riesgo.' },
+            { id: 'peyea', name: '11. Matriz PEYEA', icon: 'fa-compass', title: 'Matriz PEYEA (Posición Estratégica)', number: 'M11', desc: 'Determina si la postura estratégica general debe ser Agresiva, Conservadora, Defensiva o Competitiva balanceando Factores Internos y Externos.', use: 'Caso de uso: Orientación estratégica global basada en vectores numéricos multi-variable.' },
+            { id: 'impc', name: '12. Matriz IMPC', icon: 'fa-trophy', title: 'Índice de Posicionamiento y Competitividad (IMPC)', number: 'M12', desc: 'Evalúa ponderadamente la fuerza de la empresa vs el principal competidor en factores clave de éxito.', use: 'Caso de uso: Benchmarking estratégico directo para planificar la diferenciación en el mercado.' }
+        ];
+
+        let currentModelIndex = 0;
+        let chartInstances = {};
+
+        // INICIALIZACIÓN DE LA NAVEGACIÓN
+        window.onload = function() {
+            renderNavigation();
+            loadModel(0);
+
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('-translate-x-full');
+            });
+        };
+
+        function renderNavigation() {
+            const nav = document.getElementById('navigationMenu');
+            nav.innerHTML = MODELS.map((model, idx) => `
+                <button onclick="loadModel(${idx})" class="w-full text-left px-3 py-2.5 rounded-lg flex items-center space-x-3 text-sm font-medium hover:bg-[#005AAA]/50 transition text-gray-200 ${idx === 0 ? 'active-nav' : ''}" id="nav-btn-${idx}">
+                    <i class="fa-solid ${model.icon} w-5 text-center text-[#00B8D1]"></i>
+                    <span class="truncate">${model.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function loadModel(index) {
+            currentModelIndex = index;
+            const model = MODELS[index];
+
+            // Actualizar botones del menú
+            MODELS.forEach((_, idx) => {
+                const btn = document.getElementById(`nav-btn-${idx}`);
+                if (btn) {
+                    if (idx === index) btn.classList.add('active-nav');
+                    else btn.classList.remove('active-nav');
+                }
+            });
+
+            // Actualizar textos principales
+            document.getElementById('modelNumber').innerText = model.number;
+            document.getElementById('modelTitle').innerText = model.title;
+            document.getElementById('modelSubtitle').innerText = model.desc;
+            document.getElementById('modelDescriptionText').innerText = model.desc;
+            document.getElementById('modelUseCaseText').innerText = model.use;
+            document.getElementById('descriptionBox').classList.add('hidden');
+
+            // Renderizar la vista específica
+            renderModelUI(model.id);
+
+            // Cargar datos demo por defecto al iniciar
+            loadDemoData();
+        }
+
+        function toggleDescription() {
+            const box = document.getElementById('descriptionBox');
+            box.classList.toggle('hidden');
+        }
+
+        // LIMPIAR CONTENEDOR Y DESTRUIR GRÁFICOS PREVIOS
+        function clearCanvasReferences() {
+            Object.keys(chartInstances).forEach(key => {
+                if (chartInstances[key]) {
+                    chartInstances[key].destroy();
+                    delete chartInstances[key];
+                }
+            });
+        }
+
+        // CONTROLADOR DE UI DINÁMICA
+        function renderModelUI(modelId) {
+            clearCanvasReferences();
+            const container = document.getElementById('modelContainer');
+
+            switch(modelId) {
+                case 'foda':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <h3 class="font-bold text-green-700 flex items-center mb-2"><i class="fa-solid fa-shield-halved mr-2"></i> Fortalezas (Interno)</h3>
+                                <textarea id="foda_f" rows="4" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#00B8D1] outline-none" placeholder="Ingrese fortalezas (una por línea)..."></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                                <h3 class="font-bold text-blue-700 flex items-center mb-2"><i class="fa-solid fa-lightbulb mr-2"></i> Oportunidades (Externo)</h3>
+                                <textarea id="foda_o" rows="4" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#00B8D1] outline-none" placeholder="Ingrese oportunidades (una por línea)..."></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-yellow-500 shadow-sm">
+                                <h3 class="font-bold text-yellow-700 flex items-center mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Debilidades (Interno)</h3>
+                                <textarea id="foda_d" rows="4" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#00B8D1] outline-none" placeholder="Ingrese debilidades (una por línea)..."></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-sm">
+                                <h3 class="font-bold text-red-700 flex items-center mb-2"><i class="fa-solid fa-[#00B8D1] fa-radiation mr-2"></i> Amenazas (Externo)</h3>
+                                <textarea id="foda_a" rows="4" class="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#00B8D1] outline-none" placeholder="Ingrese amenazas (una por línea)..."></textarea>
+                            </div>
+                        </div>
+                        <div id="foda_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'dafo':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl border-t-4 border-[#005AAA] shadow-sm">
+                                <h3 class="font-bold text-[#284378] mb-1">Estrategias FO (Maxi-Maxi)</h3>
+                                <p class="text-xs text-gray-500 mb-2">Usar fortalezas para aprovechar oportunidades.</p>
+                                <textarea id="dafo_fo" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-t-4 border-[#00B8D1] shadow-sm">
+                                <h3 class="font-bold text-[#284378] mb-1">Estrategias DO (Mini-Maxi)</h3>
+                                <p class="text-xs text-gray-500 mb-2">Superar debilidades aprovechando oportunidades.</p>
+                                <textarea id="dafo_do" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-t-4 border-amber-500 shadow-sm">
+                                <h3 class="font-bold text-[#284378] mb-1">Estrategias FA (Maxi-Mini)</h3>
+                                <p class="text-xs text-gray-500 mb-2">Usar fortalezas para evitar amenazas.</p>
+                                <textarea id="dafo_fa" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-t-4 border-red-500 shadow-sm">
+                                <h3 class="font-bold text-[#284378] mb-1">Estrategias DA (Mini-Mini)</h3>
+                                <p class="text-xs text-gray-500 mb-2">Minimizar debilidades y evitar amenazas.</p>
+                                <textarea id="dafo_da" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div id="dafo_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'came':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-sm">
+                                <h3 class="font-bold text-amber-700 mb-2"><i class="fa-solid fa-wrench mr-2"></i> C - Corregir Debilidades</h3>
+                                <textarea id="came_c" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-sm">
+                                <h3 class="font-bold text-red-700 mb-2"><i class="fa-solid fa-shield-cat mr-2"></i> A - Afrontar Amenazas</h3>
+                                <textarea id="came_a" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <h3 class="font-bold text-green-700 mb-2"><i class="fa-solid fa-anchor mr-2"></i> M - Mantener Fortalezas</h3>
+                                <textarea id="came_m" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                                <h3 class="font-bold text-blue-700 mb-2"><i class="fa-solid fa-rocket mr-2"></i> E - Explotar Oportunidades</h3>
+                                <textarea id="came_e" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div id="came_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'pestel':
+                    const pestelCats = ['Político', 'Económico', 'Social', 'Tecnológico', 'Ecológico', 'Legal'];
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            ${pestelCats.map((cat, idx) => `
+                                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                    <h4 class="font-bold text-[#284378] mb-2 flex items-center">
+                                        <span class="w-6 h-6 rounded-full bg-[#005AAA] text-white text-xs flex items-center justify-center mr-2">${cat[0]}</span>
+                                        ${cat}
+                                    </h4>
+                                    <textarea id="pestel_${idx}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm" placeholder="Factores clave en ámbito ${cat.toLowerCase()}..."></textarea>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="pestel_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'bcg':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3 lg:col-span-1">
+                                <h3 class="font-bold text-[#284378] mb-2">Productos / SBU</h3>
+                                <div id="bcg_inputs" class="space-y-3"></div>
+                                <button onclick="addBCGRow()" class="w-full py-1.5 bg-gray-100 hover:bg-gray-200 text-[#284378] text-xs font-semibold rounded border border-gray-300">+ Agregar Producto</button>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm lg:col-span-2 flex flex-col items-center justify-center">
+                                <h3 class="font-bold text-[#284378] mb-2">Matriz Crecimiento - Participación</h3>
+                                <div class="w-full h-80 relative">
+                                    <canvas id="bcgChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="bcg_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'oceano':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-red-500 shadow-sm">
+                                <h3 class="font-bold text-red-700 mb-1"><i class="fa-solid fa-circle-minus mr-2"></i> ELIMINAR</h3>
+                                <p class="text-xs text-gray-500 mb-2">Factores que la industria da por sentados pero no aportan valor.</p>
+                                <textarea id="oceano_e" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-amber-500 shadow-sm">
+                                <h3 class="font-bold text-amber-700 mb-1"><i class="fa-solid fa-arrow-down-short-wide mr-2"></i> REDUCIR</h3>
+                                <p class="text-xs text-gray-500 mb-2">Factores que deben reducirse por debajo del estándar de la industria.</p>
+                                <textarea id="oceano_r" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-blue-500 shadow-sm">
+                                <h3 class="font-bold text-blue-700 mb-1"><i class="fa-solid fa-arrow-up-wide-short mr-2"></i> INCREMENTAR</h3>
+                                <p class="text-xs text-gray-500 mb-2">Factores que deben elevarse muy por encima del estándar.</p>
+                                <textarea id="oceano_i" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <h3 class="font-bold text-green-700 mb-1"><i class="fa-solid fa-circle-plus mr-2"></i> CREAR</h3>
+                                <p class="text-xs text-gray-500 mb-2">Factores que la industria nunca ha ofrecido.</p>
+                                <textarea id="oceano_c" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mt-4">
+                            <h3 class="font-bold text-[#284378] mb-3">Curva de Valor Competitiva</h3>
+                            <div class="w-full h-72">
+                                <canvas id="oceanoChart"></canvas>
+                            </div>
+                        </div>
+                        <div id="oceano_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'porter5':
+                    const porterForces = [
+                        { id: 'p1', name: 'Rivalidad entre Competidores Existentes' },
+                        { id: 'p2', name: 'Amenaza de Nuevos Entrantes' },
+                        { id: 'p3', name: 'Amenaza de Productos Sustitutos' },
+                        { id: 'p4', name: 'Poder de Negociación de Proveedores' },
+                        { id: 'p5', name: 'Poder de Negociación de Clientes' }
+                    ];
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                                <h3 class="font-bold text-[#284378] border-b pb-2">Evaluación de Intensidad (1: Muy Baja - 5: Muy Alta)</h3>
+                                ${porterForces.map(f => `
+                                    <div>
+                                        <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
+                                            <span>${f.name}</span>
+                                            <span id="${f.id}_val" class="font-bold text-[#005AAA]">3</span>
+                                        </div>
+                                        <input type="range" id="${f.id}" min="1" max="5" value="3" oninput="document.getElementById('${f.id}_val').innerText=this.value" class="w-full accent-[#005AAA]">
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center">
+                                <h3 class="font-bold text-[#284378] mb-2">Radar de Presión Competitiva</h3>
+                                <div class="w-full h-72">
+                                    <canvas id="porterChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="porter5_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'cadena':
+                    container.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                <h3 class="font-bold text-[#005AAA] mb-2"><i class="fa-solid fa-layer-group mr-2"></i> Actividades de Soporte</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Infraestructura</label>
+                                        <input type="text" id="cad_inf" class="w-full p-2 border rounded mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Recursos Humanos</label>
+                                        <input type="text" id="cad_rh" class="w-full p-2 border rounded mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Desarrollo Tecnológico</label>
+                                        <input type="text" id="cad_tec" class="w-full p-2 border rounded mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Compras / Abastecimiento</label>
+                                        <input type="text" id="cad_com" class="w-full p-2 border rounded mt-1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                <h3 class="font-bold text-[#284378] mb-2"><i class="fa-solid fa-truck-fast mr-2"></i> Actividades Primarias</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-xs">
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Logística Entrada</label>
+                                        <textarea id="cad_le" rows="3" class="w-full p-1.5 border rounded mt-1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Operaciones</label>
+                                        <textarea id="cad_op" rows="3" class="w-full p-1.5 border rounded mt-1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Logística Salida</label>
+                                        <textarea id="cad_ls" rows="3" class="w-full p-1.5 border rounded mt-1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Marketing y Ventas</label>
+                                        <textarea id="cad_mk" rows="3" class="w-full p-1.5 border rounded mt-1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-gray-700">Servicio Postventa</label>
+                                        <textarea id="cad_sv" rows="3" class="w-full p-1.5 border rounded mt-1"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="cadena_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'mckinsey':
+                    const s7 = ['Estrategia (Strategy)', 'Estructura (Structure)', 'Sistemas (Systems)', 'Valores Compartidos (Shared Values)', 'Estilo (Style)', 'Personal (Staff)', 'Habilidades (Skills)'];
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${s7.map((s, i) => `
+                                <div class="bg-white p-4 rounded-xl border-t-4 border-[#005AAA] shadow-sm">
+                                    <h4 class="font-bold text-[#284378] text-sm mb-2">${s}</h4>
+                                    <textarea id="s7_${i}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="Estado y alineación de ${s}..."></textarea>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div id="mckinsey_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'ansoff':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 border-blue-500">
+                                <h3 class="font-bold text-[#284378]">1. Penetración de Mercado</h3>
+                                <p class="text-xs text-gray-500 mb-2">Productos Existentes en Mercados Existentes.</p>
+                                <textarea id="ansoff_1" rows="3" class="w-full p-2 border rounded text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 border-cyan-500">
+                                <h3 class="font-bold text-[#284378]">2. Desarrollo de Productos</h3>
+                                <p class="text-xs text-gray-500 mb-2">Nuevos Productos en Mercados Existentes.</p>
+                                <textarea id="ansoff_2" rows="3" class="w-full p-2 border rounded text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 border-amber-500">
+                                <h3 class="font-bold text-[#284378]">3. Desarrollo de Mercados</h3>
+                                <p class="text-xs text-gray-500 mb-2">Productos Existentes en Nuevos Mercados.</p>
+                                <textarea id="ansoff_3" rows="3" class="w-full p-2 border rounded text-sm"></textarea>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm border-l-4 border-purple-500">
+                                <h3 class="font-bold text-[#284378]">4. Diversificación</h3>
+                                <p class="text-xs text-gray-500 mb-2">Nuevos Productos en Nuevos Mercados.</p>
+                                <textarea id="ansoff_4" rows="3" class="w-full p-2 border rounded text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div id="ansoff_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'peyea':
+                    container.innerHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3 text-xs">
+                                <h3 class="font-bold text-[#284378] text-sm border-b pb-1">Evaluación de Dimensiones (+1 a +6 / -1 a -6)</h3>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="font-bold text-green-700">Fuerza Financiera (FF: 1 a 6)</label>
+                                        <input type="number" id="peyea_ff" min="1" max="6" value="4" class="w-full p-1 border rounded">
+                                    </div>
+                                    <div>
+                                        <label class="font-bold text-blue-700">Fuerza de la Industria (FI: 1 a 6)</label>
+                                        <input type="number" id="peyea_fi" min="1" max="6" value="5" class="w-full p-1 border rounded">
+                                    </div>
+                                    <div>
+                                        <label class="font-bold text-red-700">Ventaja Competitiva (VC: -6 a -1)</label>
+                                        <input type="number" id="peyea_vc" min="-6" max="-1" value="-2" class="w-full p-1 border rounded">
+                                    </div>
+                                    <div>
+                                        <label class="font-bold text-amber-700">Estabilidad del Entorno (EA: -6 a -1)</label>
+                                        <input type="number" id="peyea_ea" min="-6" max="-1" value="-3" class="w-full p-1 border rounded">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center">
+                                <h3 class="font-bold text-[#284378] mb-2">Vector Direccional PEYEA</h3>
+                                <div class="w-full h-72 relative">
+                                    <canvas id="peyeaChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="peyea_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+
+                case 'impc':
+                    container.innerHTML = `
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+                            <h3 class="font-bold text-[#284378] mb-3">Factores Clave de Competitividad</h3>
+                            <table class="w-full text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-100 text-[#284378]">
+                                        <th class="p-2 border">Factor Crítico</th>
+                                        <th class="p-2 border w-20">Peso %</th>
+                                        <th class="p-2 border w-28">Nuestra Calificación (1-5)</th>
+                                        <th class="p-2 border w-28">Competidor (1-5)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="impc_rows">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="impc_result" class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hidden"></div>
+                    `;
+                    break;
+            }
+        }
+
+        // AGREGAR FILA A BCG
+        function addBCGRow(name='', grow=5, share=1) {
+            const container = document.getElementById('bcg_inputs');
+            if(!container) return;
+            const div = document.createElement('div');
+            div.className = "flex items-center space-x-2 text-xs bg-gray-50 p-2 rounded border border-gray-200";
+            div.innerHTML = `
+                <input type="text" value="${name}" placeholder="Producto" class="bcg_name w-1/3 p-1 border rounded">
+                <input type="number" value="${grow}" placeholder="Crec %" class="bcg_grow w-1/4 p-1 border rounded" title="Tasa Crecimiento Mercado %">
+                <input type="number" value="${share}" step="0.1" placeholder="Part. Rel." class="bcg_share w-1/4 p-1 border rounded" title="Participación Relativa Mercado">
+                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 px-1"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        // ACCIÓN: CARGAR DATOS DEMO POR MODELO
+        function loadDemoData() {
+            const modelId = MODELS[currentModelIndex].id;
+
+            switch(modelId) {
+                case 'foda':
+                    document.getElementById('foda_f').value = "1. Marca consolidada y de alta confianza.\n2. Red de distribución global eficiente.\n3. Fuerte capacidad de I+D e innovación.";
+                    document.getElementById('foda_o').value = "1. Expansión acelerada en mercados emergentes.\n2. Creciente demanda de soluciones sostenibles.\n3. Digitalización de canales B2B.";
+                    document.getElementById('foda_d').value = "1. Dependencia de proveedores clave de chips.\n2. Costos operacionales elevados en Europa.\n3. Tiempos de respuesta lentos en soporte.";
+                    document.getElementById('foda_a').value = "1. Entrada de nuevos competidores de bajo costo.\n2. Volatilidad en tasas de cambio e inflación.\n3. Regulaciones ambientales más estrictas.";
+                    break;
+
+                case 'dafo':
+                    document.getElementById('dafo_fo').value = "Lanzar nueva línea sustentable utilizando la red de distribución global.";
+                    document.getElementById('dafo_do').value = "Diversificar proveedores aprovechando la expansión en mercados emergentes.";
+                    document.getElementById('dafo_fa').value = "Apalancar el prestigio de marca para contrarrestar competidores de bajo costo.";
+                    document.getElementById('dafo_da').value = "Rediseñar estructura de costos operativos para mitigar efectos de la inflación.";
+                    break;
+
+                case 'came':
+                    document.getElementById('came_c').value = "Establecer contratos multiorigen para evitar dependencia de proveedores.";
+                    document.getElementById('came_a').value = "Crear sub-marca económica para blindar cuota ante marcas de bajo costo.";
+                    document.getElementById('came_m').value = "Mantener presupuesto de I+D por encima del 8% de las ventas anuales.";
+                    document.getElementById('came_e').value = "Invertir $2M en plataforma de comercio electrónico B2B en Latinoamérica.";
+                    break;
+
+                case 'pestel':
+                    document.getElementById('pestel_0').value = "Tratados comerciales regionales favorables; tensiones geopolíticas en logística.";
+                    document.getElementById('pestel_1').value = "Recuperación moderada del PIB; presiones inflacionarias en materia prima.";
+                    document.getElementById('pestel_2').value = "Preferencia creciente por marcas éticas y consumo consciente.";
+                    document.getElementById('pestel_3').value = "Adopción de Inteligencia Artificial para optimizar cadena de suministro.";
+                    document.getElementById('pestel_4').value = "Compromiso de huella de carbono neutra para 2030.";
+                    document.getElementById('pestel_5').value = "Nueva normativa de protección de datos personales y ciberseguridad.";
+                    break;
+
+                case 'bcg':
+                    const inputs = document.getElementById('bcg_inputs');
+                    inputs.innerHTML = '';
+                    addBCGRow('Línea Cloud Enterprise', 18, 2.5);
+                    addBCGRow('Software On-Premise', 2, 3.8);
+                    addBCGRow('App Móvil B2C', 22, 0.4);
+                    addBCGRow('Hardware Heredado', 1, 0.2);
+                    calculateModel();
+                    break;
+
+                case 'oceano':
+                    document.getElementById('oceano_e').value = "Sucursales físicas tradicionales y papeleo en físico.";
+                    document.getElementById('oceano_r').value = "Tiempos de espera en atención al cliente y tarifas por transacción.";
+                    document.getElementById('oceano_i').value = "Velocidad de aprobación crediticia y autoservicio digital 24/7.";
+                    document.getElementById('oceano_c').value = "Asesor financiero automatizado por IA con micro-inversiones sin comisión.";
+                    calculateModel();
+                    break;
+
+                case 'porter5':
+                    document.getElementById('p1').value = 4;
+                    document.getElementById('p2').value = 2;
+                    document.getElementById('p3').value = 3;
+                    document.getElementById('p4').value = 4;
+                    document.getElementById('p5').value = 2;
+                    document.getElementById('p1_val').innerText = '4';
+                    document.getElementById('p2_val').innerText = '2';
+                    document.getElementById('p3_val').innerText = '3';
+                    document.getElementById('p4_val').innerText = '4';
+                    document.getElementById('p5_val').innerText = '2';
+                    calculateModel();
+                    break;
+
+                case 'cadena':
+                    document.getElementById('cad_inf').value = "ERP SAP integrado, gestión corporativa centralizada.";
+                    document.getElementById('cad_rh').value = "Capacitación continua, bonos por desempeño.";
+                    document.getElementById('cad_tec').value = "Automatización con IA, desarrollo propio de software.";
+                    document.getElementById('cad_com').value = "Contratos marco global con economías de escala.";
+                    document.getElementById('cad_le').value = "Recepción de insumos Just-In-Time con RFID.";
+                    document.getElementById('cad_op').value = "Plantas automatizadas con certificación ISO 9001.";
+                    document.getElementById('cad_ls').value = "Centros de distribución urbanos ultrarrápidos.";
+                    document.getElementById('cad_mk').value = "Marketing digital omnicanal orientado a datos.";
+                    document.getElementById('cad_sv').value = "Mesa de ayuda 24/7 y garantía extendida.";
+                    break;
+
+                case 'mckinsey':
+                    document.getElementById('s7_0').value = "Estrategia orientada al liderazgo en diferenciación tecnológica.";
+                    document.getElementById('s7_1').value = "Estructura matricial descentralizada por unidades de negocio.";
+                    document.getElementById('s7_2').value = "Sistemas CRM y ERP integrados en tiempo real.";
+                    document.getElementById('s7_3').value = "Valores de Innovación, Agilidad y Transparencia.";
+                    document.getElementById('s7_4').value = "Liderazgo participativo orientado a objetivos (OKRs).";
+                    document.getElementById('s7_5').value = "Talento joven con alta tasa de retención.";
+                    document.getElementById('s7_6').value = "Fuerte dominio en analítica de datos y ciencia de datos.";
+                    break;
+
+                case 'ansoff':
+                    document.getElementById('ansoff_1').value = "Campañas de fidelización para clientes actuales de software.";
+                    document.getElementById('ansoff_2').value = "Desarrollo de módulo complementario de ciberseguridad.";
+                    document.getElementById('ansoff_3').value = "Apertura de operaciones comerciales en el sudeste asiático.";
+                    document.getElementById('ansoff_4').value = "Adquisición de startup de biotecnología para entrar en salud digital.";
+                    break;
+
+                case 'peyea':
+                    document.getElementById('peyea_ff').value = 5;
+                    document.getElementById('peyea_fi').value = 5;
+                    document.getElementById('peyea_vc').value = -2;
+                    document.getElementById('peyea_ea').value = -2;
+                    calculateModel();
+                    break;
+
+                case 'impc':
+                    const tbody = document.getElementById('impc_rows');
+                    tbody.innerHTML = `
+                        <tr>
+                            <td class="p-2 border font-medium">Calidad de Producto</td>
+                            <td class="p-2 border"><input type="number" value="25" class="impc_w w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="5" class="impc_us w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="3" class="impc_them w-full p-1 border rounded"></td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border font-medium">Competitividad de Precios</td>
+                            <td class="p-2 border"><input type="number" value="20" class="impc_w w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="3" class="impc_us w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="4" class="impc_them w-full p-1 border rounded"></td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border font-medium">Reconocimiento de Marca</td>
+                            <td class="p-2 border"><input type="number" value="20" class="impc_w w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="4" class="impc_us w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="4" class="impc_them w-full p-1 border rounded"></td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border font-medium">Red de Distribución</td>
+                            <td class="p-2 border"><input type="number" value="20" class="impc_w w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="4" class="impc_us w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="2" class="impc_them w-full p-1 border rounded"></td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border font-medium">Servicio al Cliente</td>
+                            <td class="p-2 border"><input type="number" value="15" class="impc_w w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="5" class="impc_us w-full p-1 border rounded"></td>
+                            <td class="p-2 border"><input type="number" value="3" class="impc_them w-full p-1 border rounded"></td>
+                        </tr>
+                    `;
+                    calculateModel();
+                    break;
+            }
+        }
+
+        // ACCIÓN: LIMPIAR DATOS DEL MODELO ACTIVO
+        function clearModelData() {
+            const inputs = document.querySelectorAll('#modelContainer textarea, #modelContainer input[type="text"]');
+            inputs.forEach(input => input.value = '');
+
+            const results = document.querySelectorAll('#modelContainer [id$="_result"]');
+            results.forEach(res => {
+                res.classList.add('hidden');
+                res.innerHTML = '';
+            });
+
+            if (chartInstances['bcgChart']) chartInstances['bcgChart'].destroy();
+            if (chartInstances['oceanoChart']) chartInstances['oceanoChart'].destroy();
+            if (chartInstances['porterChart']) chartInstances['porterChart'].destroy();
+            if (chartInstances['peyeaChart']) chartInstances['peyeaChart'].destroy();
+        }
+
+        // ACCIÓN: CÁLCULO Y GENERACIÓN DE RESULTADOS
+        function calculateModel() {
+            const modelId = MODELS[currentModelIndex].id;
+
+            switch(modelId) {
+                case 'foda':
+                    const f = document.getElementById('foda_f').value.split('\n').filter(x=>x.trim());
+                    const o = document.getElementById('foda_o').value.split('\n').filter(x=>x.trim());
+                    const d = document.getElementById('foda_d').value.split('\n').filter(x=>x.trim());
+                    const a = document.getElementById('foda_a').value.split('\n').filter(x=>x.trim());
+
+                    const resFoda = document.getElementById('foda_result');
+                    resFoda.classList.remove('hidden');
+                    resFoda.innerHTML = `
+                        <h3 class="font-bold text-[#284378] text-lg mb-3 border-b pb-2">Diagnóstico Estratégico FODA</h3>
+                        <div class="grid grid-cols-2 gap-4 text-xs">
+                            <div class="bg-green-50 p-3 rounded"><strong>Balance Interno Positivo (Fortalezas):</strong> ${f.length} ítems identificados.</div>
+                            <div class="bg-blue-50 p-3 rounded"><strong>Oportunidades de Entorno:</strong> ${o.length} ítems detectados.</div>
+                            <div class="bg-yellow-50 p-3 rounded"><strong>Puntos de Vulnerabilidad Interna:</strong> ${d.length} debilidades a mitigar.</div>
+                            <div class="bg-red-50 p-3 rounded"><strong>Riesgos de Entorno:</strong> ${a.length} amenazas activas.</div>
+                        </div>
+                        <div class="mt-4 p-3 bg-slate-100 rounded text-xs text-slate-700">
+                            <strong>Conclusión Diagnóstica:</strong> ${f.length >= d.length ? 'Posición interna sólida. Se recomienda estrategia ofensiva.' : 'Posición interna vulnerable. Priorizar corrección de debilidades antes de expansiones.'}
+                        </div>
+                    `;
+                    break;
+
+                case 'dafo':
+                case 'came':
+                case 'pestel':
+                case 'cadena':
+                case 'mckinsey':
+                case 'ansoff':
+                    const resGen = document.getElementById(`${modelId}_result`);
+                    resGen.classList.remove('hidden');
+                    resGen.innerHTML = `
+                        <div class="flex items-center space-x-2 text-green-600 font-bold mb-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Modelo Procesado Correctamente</span>
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Se han consolidado las variables ingresadas en la estructura oficial de <strong>${MODELS[currentModelIndex].title}</strong>. Los datos quedan listos para su integración en la síntesis del plan ejecutivo.
+                        </p>
+                    `;
+                    break;
+
+                case 'bcg':
+                    const names = Array.from(document.querySelectorAll('.bcg_name')).map(e=>e.value);
+                    const grows = Array.from(document.querySelectorAll('.bcg_grow')).map(e=>parseFloat(e.value)||0);
+                    const shares = Array.from(document.querySelectorAll('.bcg_share')).map(e=>parseFloat(e.value)||0);
+
+                    const dataBCG = names.map((n, i) => ({
+                        x: shares[i],
+                        y: grows[i],
+                        r: 12,
+                        label: n
+                    }));
+
+                    const ctxBCG = document.getElementById('bcgChart').getContext('2d');
+                    if (chartInstances['bcgChart']) chartInstances['bcgChart'].destroy();
+
+                    chartInstances['bcgChart'] = new Chart(ctxBCG, {
+                        type: 'bubble',
+                        data: {
+                            datasets: [{
+                                label: 'Productos / Unidades de Negocio',
+                                data: dataBCG,
+                                backgroundColor: '#00B8D1'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { title: { display: true, text: 'Participación Relativa de Mercado (Corte en 1.0)' }, min: 0, max: 4 },
+                                y: { title: { display: true, text: 'Tasa de Crecimiento del Mercado (%)' }, min: 0, max: 30 }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => `${ctx.raw.label}: Part=${ctx.raw.x}, Crec=${ctx.raw.y}%`
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    const resBCG = document.getElementById('bcg_result');
+                    resBCG.classList.remove('hidden');
+                    resBCG.innerHTML = `<p class="text-xs text-[#284378] font-semibold">Matriz BCG generada con ${names.length} productos graficados.</p>`;
+                    break;
+
+                case 'oceano':
+                    const ctxOceano = document.getElementById('oceanoChart').getContext('2d');
+                    if (chartInstances['oceanoChart']) chartInstances['oceanoChart'].destroy();
+
+                    chartInstances['oceanoChart'] = new Chart(ctxOceano, {
+                        type: 'line',
+                        data: {
+                            labels: ['Precio', 'Procesos Manuales', 'Velocidad', 'Personalización', 'Innovación IA'],
+                            datasets: [
+                                { label: 'Promedio Industria', data: [4, 5, 2, 2, 1], borderColor: '#94a3b8', borderDash: [5, 5] },
+                                { label: 'Nuestra Estrategia (Océano Azul)', data: [2, 1, 5, 5, 5], borderColor: '#00B8D1', backgroundColor: 'rgba(0,184,209,0.1)', fill: true }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { min: 0, max: 5 } }
+                        }
+                    });
+
+                    const resOceano = document.getElementById('oceano_result');
+                    resOceano.classList.remove('hidden');
+                    resOceano.innerHTML = `<p class="text-xs text-green-700 font-semibold"><i class="fa-solid fa-check mr-1"></i> Cuadro de mando de innovación y Curva de Valor actualizados.</p>`;
+                    break;
+
+                case 'porter5':
+                    const p1 = parseInt(document.getElementById('p1').value);
+                    const p2 = parseInt(document.getElementById('p2').value);
+                    const p3 = parseInt(document.getElementById('p3').value);
+                    const p4 = parseInt(document.getElementById('p4').value);
+                    const p5 = parseInt(document.getElementById('p5').value);
+
+                    const ctxPorter = document.getElementById('porterChart').getContext('2d');
+                    if (chartInstances['porterChart']) chartInstances['porterChart'].destroy();
+
+                    chartInstances['porterChart'] = new Chart(ctxPorter, {
+                        type: 'radar',
+                        data: {
+                            labels: ['Rivalidad', 'Nuevos Entrantes', 'Sustitutos', 'Proveedores', 'Clientes'],
+                            datasets: [{
+                                label: 'Intensidad de Fuerza',
+                                data: [p1, p2, p3, p4, p5],
+                                backgroundColor: 'rgba(0, 90, 170, 0.2)',
+                                borderColor: '#005AAA',
+                                pointBackgroundColor: '#00B8D1'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } }
+                        }
+                    });
+
+                    const avgPorter = ((p1+p2+p3+p4+p5)/5).toFixed(2);
+                    const resPorter = document.getElementById('porter5_result');
+                    resPorter.classList.remove('hidden');
+                    resPorter.innerHTML = `
+                        <h4 class="font-bold text-[#284378] text-sm">Atractivo General de la Industria: <span class="${avgPorter > 3.5 ? 'text-red-600' : 'text-green-600'}">${avgPorter} / 5.0</span></h4>
+                        <p class="text-xs text-gray-600 mt-1">${avgPorter > 3.5 ? 'Industria de alta presión competitiva y márgenes bajo presión.' : 'Industria con presión moderada/baja y buen atractivo para rentabilidad.'}</p>
+                    `;
+                    break;
+
+                case 'peyea':
+                    const ff = parseFloat(document.getElementById('peyea_ff').value);
+                    const fi = parseFloat(document.getElementById('peyea_fi').value);
+                    const vc = parseFloat(document.getElementById('peyea_vc').value);
+                    const ea = parseFloat(document.getElementById('peyea_ea').value);
+
+                    const xPEYEA = fi + vc; // Eje X
+                    const yPEYEA = ff + ea; // Eje Y
+
+                    const ctxPEYEA = document.getElementById('peyeaChart').getContext('2d');
+                    if (chartInstances['peyeaChart']) chartInstances['peyeaChart'].destroy();
+
+                    chartInstances['peyeaChart'] = new Chart(ctxPEYEA, {
+                        type: 'scatter',
+                        data: {
+                            datasets: [{
+                                label: 'Vector PEYEA',
+                                data: [{x: 0, y: 0}, {x: xPEYEA, y: yPEYEA}],
+                                showLine: true,
+                                borderColor: '#005AAA',
+                                backgroundColor: '#00B8D1',
+                                pointRadius: [0, 6]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { min: -6, max: 6, title: { display: true, text: 'Eje X (Ventaja Comp. + Fuerza Ind.)' } },
+                                y: { min: -6, max: 6, title: { display: true, text: 'Eje Y (Fuerza Fin. + Estabilidad Ent.)' } }
+                            }
+                        }
+                    });
+
+                    let posture = "";
+                    if (xPEYEA >= 0 && yPEYEA >= 0) posture = "AGRESIVA (Aprovechar fortalezas e industria atractiva)";
+                    else if (xPEYEA < 0 && yPEYEA >= 0) posture = "CONSERVADORA (Proteger ventajas y diversificar)";
+                    else if (xPEYEA < 0 && yPEYEA < 0) posture = "DEFENSIVA (Corregir debilidades y reducir riesgos)";
+                    else posture = "COMPETITIVA (Aumentar recursos financieros y eficiencia)";
+
+                    const resPEYEA = document.getElementById('peyea_result');
+                    resPEYEA.classList.remove('hidden');
+                    resPEYEA.innerHTML = `
+                        <div class="p-3 bg-blue-50 rounded border border-blue-200 text-xs">
+                            <strong>Coordenadas del Vector:</strong> X = ${xPEYEA.toFixed(2)}, Y = ${yPEYEA.toFixed(2)}<br>
+                            <strong>Postura Estratégica Recomendada:</strong> <span class="text-[#005AAA] font-bold">${posture}</span>
+                        </div>
+                    `;
+                    break;
+
+                case 'impc':
+                    const weights = Array.from(document.querySelectorAll('.impc_w')).map(e=>parseFloat(e.value)||0);
+                    const usScores = Array.from(document.querySelectorAll('.impc_us')).map(e=>parseFloat(e.value)||0);
+                    const themScores = Array.from(document.querySelectorAll('.impc_them')).map(e=>parseFloat(e.value)||0);
+
+                    let totalW = weights.reduce((a,b)=>a+b, 0);
+                    let myTotal = 0;
+                    let themTotal = 0;
+
+                    for(let i=0; i<weights.length; i++) {
+                        myTotal += (weights[i]/100) * usScores[i];
+                        themTotal += (weights[i]/100) * themScores[i];
+                    }
+
+                    const resIMPC = document.getElementById('impc_result');
+                    resIMPC.classList.remove('hidden');
+                    resIMPC.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4 text-xs mb-2">
+                            <div class="p-3 bg-cyan-50 border border-cyan-200 rounded">
+                                <span class="text-gray-500">Puntaje Ponderado Empresa:</span>
+                                <div class="text-xl font-bold text-[#005AAA]">${myTotal.toFixed(2)} / 5.0</div>
+                            </div>
+                            <div class="p-3 bg-gray-50 border border-gray-200 rounded">
+                                <span class="text-gray-500">Puntaje Competidor Directo:</span>
+                                <div class="text-xl font-bold text-gray-700">${themTotal.toFixed(2)} / 5.0</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600">
+                            ${myTotal > themTotal ? '<strong>Diagnóstico Positivo:</strong> Su organización posee una ventaja competitiva neta frente al competidor.' : '<strong>Alerta Competitiva:</strong> El competidor supera la posición de mercado. Requiere atención inmediata en los factores de mayor peso.'}
+                            ${totalW !== 100 ? `<br><span class="text-red-500 font-semibold">* Advertencia: La suma de pesos es ${totalW}%. Se recomienda ajustar para dar 100%.</span>` : ''}
+                        </p>
+                    `;
+                    break;
+            }
+        }
+
+        // EXPORTACIÓN A IMAGEN DEL MODELO ACTUAL
+        function exportCurrentModel() {
+            const capture = document.getElementById('captureArea');
+            html2canvas(capture, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Estrategia_${MODELS[currentModelIndex].id.toUpperCase()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
